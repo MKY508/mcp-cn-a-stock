@@ -121,7 +121,3 @@ jobs:
           git add -A
           git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Update ETF data $(date '+%Y-%m-%d')" && git push)
 
----
-
-6. 点击 "Commit changes"
-7. 等待 Actions 生效后，手动触发一次运行
