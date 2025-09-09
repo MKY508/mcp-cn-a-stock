@@ -2,9 +2,8 @@ name: Fetch A-Share ETF Data
 
 on:
   schedule:
-    # 北京时间 16:10 = UTC 08:10 (每个工作日)
     - cron: '10 8 * * MON-FRI'
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   fetch-data:
@@ -20,15 +19,14 @@ jobs:
           python-version: '3.11'
           
       - name: Install dependencies
-        run: |
-          pip install akshare pandas requests
+        run: pip install akshare pandas requests
           
       - name: Create data directory
         run: mkdir -p data
         
       - name: Fetch ETF data
         run: |
-          python - <<'EOF'
+          cat > fetch_data.py << 'EOF'
           import pandas as pd
           import akshare as ak
           import time
@@ -111,8 +109,9 @@ jobs:
           # 创建更新时间戳
           with open("last_update.txt", "w") as f:
               f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"))
-          
           EOF
+          
+          python fetch_data.py
           
       - name: Commit and push changes
         run: |
@@ -120,4 +119,3 @@ jobs:
           git config --global user.email "bot@example.com"
           git add -A
           git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Update ETF data $(date '+%Y-%m-%d')" && git push)
-
