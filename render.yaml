@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: mcp-cn-stock
+    runtime: docker
+    repo: https://github.com/YOUR_GITHUB_USERNAME/mcp-cn-a-stock
+    healthCheckPath: /cnstock/sse
+    envVars:
+      - key: MSD_HOST
+        value: 82.156.17.205
+      - key: STOCK_TO_SECTOR_DATA
+        value: confs/stock_sector.json
+    autoDeploy: true
