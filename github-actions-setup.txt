@@ -1,3 +1,15 @@
+# GitHub Actions 配置说明
+
+由于权限限制，请手动在 GitHub 网页上创建 Actions：
+
+1. 在你的仓库页面，点击 "Actions" 标签
+2. 点击 "New workflow"
+3. 点击 "set up a workflow yourself"
+4. 文件名改为：fetch-data.yml
+5. 粘贴以下内容：
+
+---
+
 name: Fetch A-Share ETF Data
 
 on:
@@ -120,3 +132,8 @@ jobs:
           git config --global user.email "bot@example.com"
           git add -A
           git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Update ETF data $(date '+%Y-%m-%d')" && git push)
+
+---
+
+6. 点击 "Commit changes"
+7. 等待 Actions 生效后，手动触发一次运行
