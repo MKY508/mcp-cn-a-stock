@@ -5,6 +5,9 @@ on:
     - cron: '10 8 * * MON-FRI'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  
 jobs:
   fetch-data:
     runs-on: ubuntu-latest
@@ -12,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -64,14 +69,17 @@ jobs:
                   
                   # 只保留需要的列
                   keep_cols = ['date', 'open', 'close', 'high', 'low', 'volume', 'amount']
-                  df = df[keep_cols]
+                  existing_cols = [col for col in keep_cols if col in df.columns]
+                  df = df[existing_cols]
                   
                   # 添加代码列
                   df['code'] = code
                   
                   # 转换数据类型
                   numeric_cols = ['open', 'close', 'high', 'low', 'volume', 'amount']
-                  df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors='coerce')
+                  for col in numeric_cols:
+                      if col in df.columns:
+                          df[col] = pd.to_numeric(df[col], errors='coerce')
                   
                   # 保存单个ETF数据
                   df.to_csv(f"data/{code}.csv", index=False)
@@ -115,7 +123,7 @@ jobs:
           
       - name: Commit and push changes
         run: |
-          git config --global user.name "Data Bot"
-          git config --global user.email "bot@example.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Update ETF data $(date '+%Y-%m-%d')" && git push)
